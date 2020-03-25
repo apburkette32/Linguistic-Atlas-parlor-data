@@ -3,9 +3,9 @@
 
 <head>
   <meta charset=utf-8 />
-  <title>Lesson 08: US Power Plants</title>
+  <title>Final Project: LAP parlor</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-  <!-- Is the is the latest version of Leaflet? -->
+  
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
 
@@ -67,8 +67,8 @@
 
 <body>
   <header>
-    <h1>US Power Plants</h1>
-    <h2>sources of electricity</h2>
+    <h1>Linguistic Atlas Project</h1>
+    <h2>responses to 'parlor' question</h2>
   </header>
 
   <div id='map'></div>
@@ -79,10 +79,10 @@
   </footer>
   <!-- Is the is the latest version of Leaflet? -->
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
-  <script src="data/power-plants.js"></script>
+  <script src="data/lane_and_lamsas_combined_geocoded_2.geojson"></script>
   <script>
     var options = {
-			center: [38, -95],
+			center: [37, -77],
 			zoom: 4
 		};
 
@@ -102,11 +102,7 @@
 
 		// request some basemap tiles and add to the map
 		var tiles = L.tileLayer(basemap_source, basemap_options).addTo(map);
-		
-		
-    plants.features.sort(function(a, b) {
-      return b.properties.capacity_mw - a.properties.capacity_mw;
-    });
+	
     
     var commonStyles = {
      weight: 1,
@@ -115,17 +111,22 @@
     }
     
     var layerInfo = {
-    hydroLayer: {
-        source: "Hydro",
+    parlorLayer: {
+        response: "parlor",
         color: '#1f78b4'
     },
-    windLayer: {
-        source: "Wind",
+    sittingRoomLayer: {
+        response: "sitting room",
         color: '#a6cee3'
     },
-    solarLayer: {
-      source: "Solar",
+    livingRoomLayer: {
+      response: "living room",
       color: '#f2e6a7'
+    },
+
+    drawingRoomLayer: {
+        response: "drawing room",
+        color: '#fffff'
     }
 };
 
@@ -135,14 +136,14 @@ var geoJsonLayers = {};
 // Loop through first object
 for (var layer in layerInfo) {
     // Populate the second object with all features that
-    geoJsonLayers[layer] = L.geoJson(plants, {
+    geoJsonLayers[layer] = L.geoJson(responses, {
         // we convert to a layer
         pointToLayer: function (feature, latlng) {
             return L.circleMarker(latlng, commonStyles);
         },
         // exist in our first object
         filter: function (feature) {
-            if (feature.properties.fuel_source[layerInfo[layer].source]) {
+            if (feature.properties.right_response[layerInfo[layer].response]) {
                 return feature;
             }
         },
@@ -151,21 +152,16 @@ for (var layer in layerInfo) {
             return {
                 color: layerInfo[layer].color,
                 fillColor: layerInfo[layer].color,
-                radius: getRadius(feature.properties.fuel_source[layerInfo[layer].source])
             }
         }
     }).addTo(map);
 };
 
-function getRadius(val) {
-    var radius = Math.sqrt(val / Math.PI);
-    return radius * .8;
-};
-
 var sourcesLabels = {
-    "Hydro": geoJsonLayers.hydroLayer,
-    "Wind": geoJsonLayers.windLayer,
-    "Solar": geoJsonLayers.solarLayer
+    "parlor": geoJsonLayers.parlorLayer,
+    "sitting room": geoJsonLayers.sittingRoomLayer,
+    "living room": geoJsonLayers.livingRoomLayer,
+    "drawing room": geoJsonLayers.drawingRoomLayer
 };
 
 L.control.layers(null, sourcesLabels, {
@@ -208,28 +204,7 @@ map.on('click', function (e) {
                 // First get the properties of the for each geojson feature
                 var props = layer.feature.properties;
 
-                var content = `<h3>${props.plant_name}</h3>`;
-
-                // Some plants have more than one fuel source
-                // Find the most dominate and add it to the popup
-                var compare = 0
-                var dominate = ''
-                for (var type in props.fuel_source) {
-                    content += `${type}: 
-                                ${props.fuel_source[type].toLocaleString()} MW <br>`;
-                    if (props.fuel_source[type] > compare) {
-                        compare = props.fuel_source[type]
-                        dominate = type
-                    }
-                }
-
-                // Get fancy with adding color to the popup
-                content += `A <span style='color:${layerInfo[gsLayer].color}'>
-                           ${layerInfo[gsLayer].source}</span> facility <b> 
-                           ${distance.toLocaleString()} km</b><br> 
-                           from the click point.<br>
-                           Primarily a ${dominate} plant.`
-
+                var content = `<h3>${props.right_response}</h3>`;
 
                 layer.bindTooltip(content);
             }
