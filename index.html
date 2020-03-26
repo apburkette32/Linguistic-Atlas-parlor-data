@@ -101,6 +101,21 @@
 
 		// request some basemap tiles and add to the map
 	var tiles = L.tileLayer(basemap_source, basemap_options).addTo(map);
+  // Figure out how many different responses exists
+  var allResponses = {}
+  for (response of responses.features) {
+    phrase = response.properties.right_response
+    if (phrase != null) {
+      console.log(phrase)
+      if (!allResponses[phrase]) {
+          allResponses[phrase] = 1
+         } else {
+          allResponses[phrase] += 1
+         } 
+      }
+   }
+  console.log(allResponses)
+  
 	
    L.geoJson(responses, {
        pointToLayer: function(feature, latlng){
@@ -116,8 +131,15 @@
            if(feature.properties.right_response){
                return feature;
            }
+       },
+       style: function(feature) {
+         
+
+        
+         
        }
    }).addTo(map);
+   
    
   </script>
 
