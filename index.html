@@ -141,6 +141,12 @@
           } else if (phrase.includes('sitting')){
             return {fillColor: "orange"}
           }
+      },
+      onEachFeature: function (feature, layer) {
+        var props = feature.properties
+        var popup = `<h3>${props.right_response}</h3>
+                    ${props.sex}, ${props.age}`
+        layer.bindPopup(popup)
       }
     }).addTo(map);
 
