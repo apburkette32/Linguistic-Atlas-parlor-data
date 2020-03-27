@@ -165,8 +165,8 @@ var sittingIcon = L.icon({
       style: function (feature) {
         var phrase = feature.properties.right_response
             if (phrase.includes('parlor')) {
-            return {parlorIcon};
-            //return {fillColor: "#ff0000"}; 
+            //return {parlorIcon};
+            return {fillColor: "#ff0000"}; 
           } else if (phrase.includes('living')) {
             return {fillColor: "green"}
           } else if (phrase.includes('sitting')){
@@ -180,6 +180,15 @@ var sittingIcon = L.icon({
         layer.bindPopup(popup)
       }
     }).addTo(map);
+
+var responseLabels = {
+  "Parlor": geoJsonLayers.parlorLayer,
+  "Sitting room": geoJsonLayers.sittingLayer,
+  "Living room": geoJsonLayers.livingLayer
+};
+control.layers(null, responseLabels,{
+  collapsed: false
+}).addTo(map);    
 
 
   </script>
