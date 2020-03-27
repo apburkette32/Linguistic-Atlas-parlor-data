@@ -119,14 +119,26 @@
 
     L.geoJson(responses, {
       pointToLayer: function (feature, latlng) {
-        return L.circleMarker(latlng, {
-          color: 'gray',
-          weight: 1,
-          fillColor: 'blue',
-          fillOpacity: .8,
-          radius: 2
+        return L.marker(latlng,{
+            icon: respIcon
+    
+        //return L.circleMarker(latlng, {
+          //color: 'gray',
+          //weight: 1,
+          //fillColor: 'blue',
+          //fillOpacity: .8,
+          //radius: 2
         });
       },
+
+      var respIcon = L.icon({
+          iconURL: 'svgs/p_for_parlor.svg',
+          iconSize: [20,20],
+          fillColor: "blue"
+      })
+
+      L.geoJson(responses, {...});
+
       filter: function (feature, layer) {
         if (feature.properties.right_response) {
           return feature;
@@ -135,7 +147,8 @@
       style: function (feature) {
         var phrase = feature.properties.right_response
         if          (phrase.includes('parlor')) {
-            return {fillColor: "#ff0000"}; 
+            var icon = parlorIcon;
+            //return {fillColor: "#ff0000"}; 
           } else if (phrase.includes('living')) {
             return {fillColor: "green"}
           } else if (phrase.includes('sitting')){
