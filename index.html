@@ -52,13 +52,27 @@
       margin: 10px auto;
     }
 
-
     p {
       font-size: 1em;
       color: rgba(170, 170, 170);
       ;
       font-weight: 300;
       font-size: 1.2em;
+    }
+
+    .leaflet-popup-content h3 {
+      font-family: raleway, sans-serif;
+      font-size: 1.3em;
+      margin-bottom: 6px;
+    }
+
+    .leaflet-popup-content p {
+      margin: 3px 0 6px;
+      font-size: 1.1em;
+    }
+
+    .leaflet-popup-content a {
+      font-weight: normal;
     }
   </style>
 </head>
@@ -117,27 +131,31 @@
     }
     console.log(allResponses)
 
+var parlorIcon = L.icon({
+  iconUrl: 'svgs/p_for_parlor.svg',
+  iconSize: [30, 30]
+});
+
+var livingIcon = L.icon({
+    iconUrl: 'svgs/l_for_livingroom.svg',
+    iconSize: [30, 30]
+});
+
+var sittingIcon = L.icon({
+    iconURL: 'svgs/s_for_sittingroom.svg',
+    iconSize: [30,30]
+});
+
     L.geoJson(responses, {
       pointToLayer: function (feature, latlng) {
-        return L.marker(latlng,{
-            icon: respIcon
-    
-        //return L.circleMarker(latlng, {
-          //color: 'gray',
-          //weight: 1,
-          //fillColor: 'blue',
-          //fillOpacity: .8,
-          //radius: 2
+            return L.circleMarker(latlng, {
+          color: 'gray',
+          weight: 1,
+          fillColor: 'blue',
+          fillOpacity: .8,
+          radius: 2
         });
       },
-
-      var respIcon = L.icon({
-          iconURL: 'svgs/p_for_parlor.svg',
-          iconSize: [20,20],
-          fillColor: "blue"
-      })
-
-      L.geoJson(responses, {...});
 
       filter: function (feature, layer) {
         if (feature.properties.right_response) {
@@ -146,8 +164,8 @@
       },
       style: function (feature) {
         var phrase = feature.properties.right_response
-        if          (phrase.includes('parlor')) {
-            var icon = parlorIcon;
+            if (phrase.includes('parlor')) {
+            return {parlorIcon};
             //return {fillColor: "#ff0000"}; 
           } else if (phrase.includes('living')) {
             return {fillColor: "green"}
