@@ -93,7 +93,7 @@
   <!-- Is the is the latest version of Leaflet? -->
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="data/lane_and_lamsas_combined_geocoded_2.geojson"></script>
-  <script src="L.Control.HtmlLegend.min.js"></script>
+  <script src="L.Control.HtmlLegend.js"></script>
 
   <script>
     var options = {
@@ -135,30 +135,54 @@
     console.log(allResponses)
 
 var parlorIcon = L.icon({
-  iconUrl: 'svgs/p_for_parlor.svg',
+  iconUrl: 'svgs/p.svg',
   iconSize: [30, 30]
 });
 
 var livingIcon = L.icon({
-    iconUrl: 'svgs/l_for_livingroom.svg',
+    iconUrl: 'svgs/l.svg',
     iconSize: [30, 30]
 });
 
-var sittingIcon = L.icon({
-    iconURL: 'svgs/s_for_sittingroom.svg',
-    iconSize: [30,30]
+var sittingRoom = L.icon({
+  // This is a gotcha! Using URL vs. Url. Leaflet uses strict camelCaseY'all (does the 'a' count as a new word?)
+    iconUrl: 'svgs/s.svg',
+    iconSize: [30, 30]
 });
 
-    L.geoJson(responses, {
+
+
+    var response = L.geoJson(responses, {
+    
       pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
-          color: 'gray',
-          weight: 1,
-          fillColor: 'blue',
-          fillOpacity: .8,
-          radius: 2
-        });
-      },
+        var phrase = feature.properties.right_response
+        if (phrase) {
+          if (phrase.includes('parlor')) {
+            //return {parlorIcon};
+            var icon = parlorIcon
+          } else if (phrase.includes('living')) {
+            var icon = livingIcon
+          } else if (phrase.includes('setting')){
+            console.log(phrase)
+            var icon = sittingRoom
+          }
+        }
+        
+          if (icon) {
+            return L.marker(latlng, {
+            icon: icon
+        })
+
+          } else {
+          return L.circleMarker(latlng, {
+            // color: 'gray',
+            weight: 0,
+            fillColor: 'blue',
+            fillOpacity: .8,
+            radius: 2
+        })
+    }
+  },
 
       filter: function (feature, layer) {
         if (feature.properties.right_response) {
@@ -166,33 +190,70 @@ var sittingIcon = L.icon({
         }
       },
       style: function (feature) {
-        var phrase = feature.properties.right_response
-            if (phrase.includes('parlor')) {
-            //return {parlorIcon};
-            return {fillColor: "#ff0000"}; 
-          } else if (phrase.includes('living')) {
-            return {fillColor: "green"}
-          } else if (phrase.includes('sitting')){
-            return {fillColor: "orange"}
-          }
+        // var phrase = feature.properties.right_response
+        //     if (phrase.includes('parlor')) {
+        //     //return {parlorIcon};
+        //     return {fillColor: "#ff0000"}; 
+        //   } else if (phrase.includes('living')) {
+        //     return {fillColor: "green"}
+        //   } else if (phrase.includes('sitting')){
+        //     return {fillColor: "orange"}
+        //   }
       },
       onEachFeature: function (feature, layer) {
         var props = feature.properties
         var popup = `<h3>${props.right_response}</h3>
                     ${props.sex}, ${props.age}`
         layer.bindPopup(popup)
-      };
+      }
 
-      var htmlLegend = L.control.htmllegend({...});
-        htmlLegend.addLegend({
-        name: 'Layer name',
-        layer: layerInstance,
-        elements: [{
-            html: '<div>Legend description</div>'
-        }]
-    })
+     
 
     }).addTo(map);
+
+    // Maybe this can be done without the plugin?
+    var htmlLegend = L.control.htmllegend({
+        position: 'topright', 
+        legends: [{
+            name: 'Responses',
+            layer: response,
+            elements: [{
+                label: 'L',
+                html: '',
+                style: {
+                    'background-color': 'green',
+                    'width': '10px',
+                    'height': '10px'
+                }
+            }, {
+                label: 'P',
+                html: '',
+                style: {
+                    'background-color': 'blue',
+                    'width': '10px',
+                    'height': '10px'
+                }
+            }, {
+                label: 'S',
+                html: '',
+                style: {
+                    'background-color': 'red',
+                    'width': '10px',
+                    'height': '10px'
+                }
+            }]
+        }],
+        collapseSimple: true,
+        detectStretched: true,
+        collapsedOnInit: true,
+        defaultOpacity: 0.7,
+        visibleIcon: 'icon icon-eye',
+        hiddenIcon: 'icon icon-eye-slash'
+      })
+
+      map.addControl(htmlLegend)
+
+
 
   
 
