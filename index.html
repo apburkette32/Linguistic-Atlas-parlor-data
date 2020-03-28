@@ -8,6 +8,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
+  <link rel="stylesheet" href="L.Control.HtmlLegend.css" />
 
   <style>
     body {
@@ -92,6 +93,8 @@
   <!-- Is the is the latest version of Leaflet? -->
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="data/lane_and_lamsas_combined_geocoded_2.geojson"></script>
+  <script src="L.Control.HtmlLegend.min.js"></script>
+
   <script>
     var options = {
       center: [37, -77],
@@ -178,17 +181,20 @@ var sittingIcon = L.icon({
         var popup = `<h3>${props.right_response}</h3>
                     ${props.sex}, ${props.age}`
         layer.bindPopup(popup)
-      }
+      };
+
+      var htmlLegend = L.control.htmllegend({...});
+        htmlLegend.addLegend({
+        name: 'Layer name',
+        layer: layerInstance,
+        elements: [{
+            html: '<div>Legend description</div>'
+        }]
+    })
+
     }).addTo(map);
 
-var responseLabels = {
-  "Parlor": geoJsonLayers.parlorLayer,
-  "Sitting room": geoJsonLayers.sittingLayer,
-  "Living room": geoJsonLayers.livingLayer
-};
-control.layers(null, responseLabels,{
-  collapsed: false
-}).addTo(map);    
+  
 
 
   </script>
