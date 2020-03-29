@@ -75,6 +75,44 @@
     .leaflet-popup-content a {
       font-weight: normal;
     }
+
+    .legend {
+    line-height: 18px;
+    color: #555;
+    }
+
+    .legend i {
+    width: 18px;
+    height: 18px;
+    float: right;
+    margin-right: 8px;
+    opacity: 0.7;
+    }
+    .legend h4 {
+  text-align: center;
+  font-size: 16px;
+  margin: 2px 12px 8px;
+  color: #777;
+}
+
+.legend span {
+  position: relative;
+  bottom: 3px;
+}
+
+.legend i {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin: 0 8px 0 0;
+  opacity: 0.7;
+}
+
+.legend i.icon {
+  background-size: 18px;
+  background-color: rgba(255, 255, 255, 1);
+}
+
   </style>
 </head>
 
@@ -205,21 +243,15 @@ var sittingRoom = L.icon({
     // Maybe this can be done without the plugin?
 
     var legend = L.control({position: 'topright'});
-    legend.onAdd = function (map) {
+    legend.onAdd = function(map) {
 
-    var div = L.DomUtil.create('div', 'info legend');
-    labels = ['<strong>Categories</strong>'],
-    responses = ['parlor','living room','sitting room','other'];
+    var div = L.DomUtil.create('div', 'legend');
+    div.innerHTML += "<h4>Responses</h4>";
+    div.innerHTML += '<i style="background 477ac2"></i><span>Parlor</span><br>';
+    div.innerHTML += '<i style="background 477ac2"></i><span>Living room</span><br>';
+    div.innerHTML += '<i style="background 477ac2"></i><span>Sitting room</span><br>';
+    div.innerHTML += '<i style="background 0000ff"></i><span>Other</span><br>';
 
-    for (var i = 0; i < responses.length; i++) {
-
-            div.innerHTML += 
-            labels.push(
-                '<i class="circle" style="background:' + getColor(responses[i]) + '"></i> ' +
-            (responses[i] ? responses[i] : '+'));
-
-        }
-        div.innerHTML = labels.join('<br>');
     return div;
     };
     legend.addTo(map);
