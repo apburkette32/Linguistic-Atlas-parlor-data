@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+ 
 <head>
   <meta charset=utf-8 />
   <title>Final Project: LAP parlor</title>
@@ -8,7 +8,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700" rel="stylesheet">
-  <link rel="stylesheet" href="L.Control.HtmlLegend.css" />
+  
 
   <style>
     body {
@@ -93,7 +93,7 @@
   <!-- Is the is the latest version of Leaflet? -->
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <script src="data/lane_and_lamsas_combined_geocoded_2.geojson"></script>
-  <script src="L.Control.HtmlLegend.js"></script>
+  
 
   <script>
     var options = {
@@ -132,7 +132,7 @@
         }
       }
     }
-    console.log(allResponses)
+    //console.log(allResponses)
 
 var parlorIcon = L.icon({
   iconUrl: 'svgs/p.svg',
@@ -158,7 +158,6 @@ var sittingRoom = L.icon({
         var phrase = feature.properties.right_response
         if (phrase) {
           if (phrase.includes('parlor')) {
-            //return {parlorIcon};
             var icon = parlorIcon
           } else if (phrase.includes('living')) {
             var icon = livingIcon
@@ -190,15 +189,7 @@ var sittingRoom = L.icon({
         }
       },
       style: function (feature) {
-        // var phrase = feature.properties.right_response
-        //     if (phrase.includes('parlor')) {
-        //     //return {parlorIcon};
-        //     return {fillColor: "#ff0000"}; 
-        //   } else if (phrase.includes('living')) {
-        //     return {fillColor: "green"}
-        //   } else if (phrase.includes('sitting')){
-        //     return {fillColor: "orange"}
-        //   }
+        
       },
       onEachFeature: function (feature, layer) {
         var props = feature.properties
@@ -212,48 +203,26 @@ var sittingRoom = L.icon({
     }).addTo(map);
 
     // Maybe this can be done without the plugin?
-    var htmlLegend = L.control.htmllegend({
-        position: 'topright', 
-        legends: [{
-            name: 'Responses',
-            layer: response,
-            elements: [{
-                label: 'L',
-                html: '',
-                style: {
-                    'background-color': 'green',
-                    'width': '10px',
-                    'height': '10px'
-                }
-            }, {
-                label: 'P',
-                html: '',
-                style: {
-                    'background-color': 'blue',
-                    'width': '10px',
-                    'height': '10px'
-                }
-            }, {
-                label: 'S',
-                html: '',
-                style: {
-                    'background-color': 'red',
-                    'width': '10px',
-                    'height': '10px'
-                }
-            }]
-        }],
-        collapseSimple: true,
-        detectStretched: true,
-        collapsedOnInit: true,
-        defaultOpacity: 0.7,
-        visibleIcon: 'icon icon-eye',
-        hiddenIcon: 'icon icon-eye-slash'
-      })
 
-      map.addControl(htmlLegend)
+    var legend = L.control({position: 'topright'});
+    legend.onAdd = function (map) {
 
+    var div = L.DomUtil.create('div', 'info legend');
+    labels = ['<strong>Categories</strong>'],
+    responses = ['parlor','living room','sitting room','other'];
 
+    for (var i = 0; i < responses.length; i++) {
+
+            div.innerHTML += 
+            labels.push(
+                '<i class="circle" style="background:' + getColor(responses[i]) + '"></i> ' +
+            (responses[i] ? responses[i] : '+'));
+
+        }
+        div.innerHTML = labels.join('<br>');
+    return div;
+    };
+    legend.addTo(map);
 
   
 
@@ -262,4 +231,4 @@ var sittingRoom = L.icon({
 
 </body>
 
-</html> 
+</html>
