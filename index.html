@@ -239,22 +239,31 @@ var sittingRoom = L.icon({
 
       filter: function (feature, layer) {
       var phrase = feature.properties.right_response
+      // if phrase exists
       if (phrase) {
-        if (phrase.toLowerCase().includes(word))  { //
+        // if phrase includes the search term, palor matches palors
+        if (phrase.toLowerCase().includes(word))  { 
+          // return that feature so we can add it to the legend item
           return feature;
+        // else if the search term is other
         } else if (word == 'other') {
-        var count = 0
-          for (split of phrase.toLowerCase().split(" ")) {
-            if (words.includes(split)) {
-              count += 1
-            } 
-          } 
+          // start a counter
+          var count = 0
+          // compare the phrase to each search term in the list of words
+          words.map(function(w)  {
+            // if the search term is in the phrase up the counter by 1
+            if (phrase.toLowerCase().includes(w)) {
+              count++
+            }
+          })
+          // if phrase does not contain any search term in the array, return that feature to 'other' legend item
           if (count == 0) {
             return feature 
           }
         }
       }
       },
+      
       style: function (feature) {
         
       },
@@ -290,7 +299,7 @@ var sittingRoom = L.icon({
     div.innerHTML += '<i style="background 477ac2"><img src="svgs/p.svg"></i><span>Parlor</span><br>';
     div.innerHTML += '<i style="background 477ac2"><img src="svgs/l.svg"></i><span>Living room</span><br>';
     div.innerHTML += '<i style="background 477ac2"><img src="svgs/s.svg"></i><span>Sitting room</span><br>';
-    div.innerHTML += '<i style="background 0000ff"></i><span>Other</span><br>';
+    div.innerHTML += '<i style="background 0000ff"><img src="svgs/o.svg"></i><span>Other</span><br>';
 
     return div;
     };
