@@ -114,6 +114,18 @@
   background-color: rgba(255, 255, 255, 1);
 }
 
+.legendImg {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin: 0 8px 0 0;
+  opacity: 1;
+}
+
+.leaflet-control-layers {
+  width: 150px
+}
+
   </style>
 </head>
 
@@ -152,7 +164,7 @@
     var basemap_options = {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
-      maxZoom: 7
+      maxZoom: 11
     };
 
     // request some basemap tiles and add to the map
@@ -162,7 +174,6 @@
     for (response of responses.features) {
       phrase = response.properties.right_response
       if (phrase != null) {
-        console.log(phrase)
         if (!allResponses[phrase]) {
           allResponses[phrase] = 1
 
@@ -190,18 +201,22 @@ var sittingRoom = L.icon({
 });
 
 
+    var words = ['parlor', 'living', 'sitting', 'setting', 'other']
+    var responseCategories = {}
 
-    var response = L.geoJson(responses, {
-    
+    for (var word of words) {
+
+    responseCategories[word] = L.geoJson(responses, {
+  
       pointToLayer: function (feature, latlng) {
-        var phrase = feature.properties.right_response
+        var phrase = feature.properties.right_response.toLowerCase();
+        
         if (phrase) {
           if (phrase.includes('parlor')) {
             var icon = parlorIcon
           } else if (phrase.includes('living')) {
             var icon = livingIcon
-          } else if (phrase.includes('setting')){
-            console.log(phrase)
+          } else if (phrase.includes('setting') || phrase.includes('sitting')){
             var icon = sittingRoom
           }
         }
@@ -223,10 +238,32 @@ var sittingRoom = L.icon({
   },
 
       filter: function (feature, layer) {
-        if (feature.properties.right_response) {
+      var phrase = feature.properties.right_response
+      // if phrase exists
+      if (phrase) {
+        // if phrase includes the search term, palor matches palors
+        if (phrase.toLowerCase().includes(word))  { 
+          // return that feature so we can add it to the legend item
           return feature;
+        // else if the search term is other
+        } else if (word == 'other') {
+          // start a counter
+          var count = 0
+          // compare the phrase to each search term in the list of words
+          words.map(function(w)  {
+            // if the search term is in the phrase up the counter by 1
+            if (phrase.toLowerCase().includes(w)) {
+              count++
+            }
+          })
+          // if phrase does not contain any search term in the array, return that feature to 'other' legend item
+          if (count == 0) {
+            return feature 
+          }
         }
+      }
       },
+      
       style: function (feature) {
         
       },
@@ -237,28 +274,32 @@ var sittingRoom = L.icon({
                     <b> Age: </b>${props.age}`
         layer.bindPopup(popup)
       }
-
-     
-
     }).addTo(map);
-
+  }
     // legend made without the plugin
 
     var baseLayers = {
-		"<b style='color:#000000'>Parlor</b>": right_response["parlor"],	
-		"<b style='color:#000000'>Living room</b>": right_response["living room"],
-		"<b style='color:#000000'>Sitting room</b>": right_response["sitting room"]
+		"<img src='svgs/p.svg' class='legendImg'>Parlor": responseCategories["parlor"],	
+		"<img src='svgs/l.svg' class='legendImg'>Living room": responseCategories["living"],
+		"<img src='svgs/s.svg' class='legendImg'>Sitting room": responseCategories["sitting"],
+    "<img src='svgs/s.svg' class='legendImg'>Setting room": responseCategories["setting"],
+    "<img src='svgs/o.svg' class='legendImg'>Other": responseCategories["other"]
 	};
+
+  // add the layer control to the map
+  L.control.layers(null, baseLayers, {
+            collapsed: false
+        }).addTo(map);
 
     var legend = L.control({position: 'topright'});
     legend.onAdd = function(map) {
 
     var div = L.DomUtil.create('div', 'legend');
     div.innerHTML += "<h4>Responses</h4>";
-    div.innerHTML += '<i style="background 477ac2"></i><span>Parlor</span><br>';
-    div.innerHTML += '<i style="background 477ac2"></i><span>Living room</span><br>';
-    div.innerHTML += '<i style="background 477ac2"></i><span>Sitting room</span><br>';
-    div.innerHTML += '<i style="background 0000ff"></i><span>Other</span><br>';
+    div.innerHTML += '<i style="background 477ac2"><img src="svgs/p.svg"></i><span>Parlor</span><br>';
+    div.innerHTML += '<i style="background 477ac2"><img src="svgs/l.svg"></i><span>Living room</span><br>';
+    div.innerHTML += '<i style="background 477ac2"><img src="svgs/s.svg"></i><span>Sitting room</span><br>';
+    div.innerHTML += '<i style="background 0000ff"><img src="svgs/o.svg"></i><span>Other</span><br>';
 
     return div;
     };
