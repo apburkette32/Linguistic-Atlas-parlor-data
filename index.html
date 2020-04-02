@@ -162,7 +162,6 @@
     for (response of responses.features) {
       phrase = response.properties.right_response
       if (phrase != null) {
-        console.log(phrase)
         if (!allResponses[phrase]) {
           allResponses[phrase] = 1
 
@@ -189,19 +188,22 @@ var sittingRoom = L.icon({
     iconSize: [30, 30]
 });
 
+    var words = ['parlor', 'living', 'sitting', 'setting', 'other']
+    var responseCategories = {}
 
+    for (var word of words) {
 
-    var response = L.geoJson(responses, {
-    
+    responseCategories[word] = L.geoJson(responses, {
+  
       pointToLayer: function (feature, latlng) {
-        var phrase = feature.properties.right_response
+        var phrase = feature.properties.right_response.toLowerCase();
+        
         if (phrase) {
           if (phrase.includes('parlor')) {
             var icon = parlorIcon
           } else if (phrase.includes('living')) {
             var icon = livingIcon
-          } else if (phrase.includes('setting')){
-            console.log(phrase)
+          } else if (phrase.includes('setting') || phrase.includes('sitting')){
             var icon = sittingRoom
           }
         }
@@ -223,9 +225,22 @@ var sittingRoom = L.icon({
   },
 
       filter: function (feature, layer) {
-        if (feature.properties.right_response) {
+      var phrase = feature.properties.right_response
+      if (phrase) {
+        if (phrase.toLowerCase().includes(word))  { //
           return feature;
+        } else if (word == 'other') {
+        var count = 0
+          for (split of phrase.toLowerCase().split(" ")) {
+            if (words.includes(split)) {
+              count += 1
+            } 
+          } 
+          if (count == 0) {
+            return feature 
+          }
         }
+      }
       },
       style: function (feature) {
         
@@ -241,14 +256,14 @@ var sittingRoom = L.icon({
      
 
     }).addTo(map);
-
+  }
     // legend made without the plugin
 
-    var baseLayers = {
-		"<b style='color:#000000'>Parlor</b>": right_response["parlor"],	
-		"<b style='color:#000000'>Living room</b>": right_response["living room"],
-		"<b style='color:#000000'>Sitting room</b>": right_response["sitting room"]
-	};
+  //   var baseLayers = {
+	// 	"<b style='color:#000000'>Parlor</b>": right_response["parlor"],	
+	// 	"<b style='color:#000000'>Living room</b>": right_response["living room"],
+	// 	"<b style='color:#000000'>Sitting room</b>": right_response["sitting room"]
+	// };
 
     var legend = L.control({position: 'topright'});
     legend.onAdd = function(map) {
